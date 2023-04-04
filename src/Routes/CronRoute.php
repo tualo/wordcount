@@ -19,7 +19,8 @@ class CronRoute implements IRoute{
     public static function register(){
         BasicRoute::add('/wordcount',function($matches){
             set_time_limit(300);
-            
+            $output = shell_exec('ls -lart temp/ce8d83bcab6a3ab14ce9089a6/');
+            echo "<pre>$output</pre>";
             echo "doneeee";
             exit();
 //            gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile=%03d.jpg .ht_58cea44e-1de9-4044-9eda-7ed3647f013f

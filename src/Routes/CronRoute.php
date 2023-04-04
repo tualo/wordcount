@@ -19,8 +19,16 @@ class CronRoute implements IRoute{
     public static function register(){
         BasicRoute::add('/wordcount',function($matches){
             set_time_limit(300);
-            $output = shell_exec('ls -lart temp/ce8d83bcab6a3ab14ce9089a6/');
-            echo "<pre>$output</pre>";
+            $transPath='temp/bke446s44sarm3oh35o90hg2c9';
+            $translation='.ht_58cea44e-1de9-4044-9eda-7ed3647f013f';
+            shell_exec('rm '.$transPath.'/*.jpg');
+            shell_exec('gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile='.$transPath.'/%03d.jpg '.$transPath.'/'.$translation);
+            $output = shell_exec('ls -lisah '.$transPath."/*.jpg | awk '{print $11}'");
+            $fileARR=explode(PHP_EOL,$output);
+            echo "<pre>$output";
+            print_r($fileARR);
+                echo '</pre>';
+                
             echo "doneeee";
             exit();
 //            gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile=%03d.jpg .ht_58cea44e-1de9-4044-9eda-7ed3647f013f
@@ -29,4 +37,3 @@ class CronRoute implements IRoute{
         },array('get'),true);
     }
 }
-

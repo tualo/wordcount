@@ -40,7 +40,7 @@ class CronRoute implements IRoute{
                 echo '</pre>';
             */
             shell_exec('pdftotxt '.$transPath.'/'.$translation);
-            $c=    shell_exec('less '.$transPath.'/'.$translation.'.txt | wc -w');
+            $c=  intval(shell_exec('less '.$transPath.'/'.$translation.".txt | wc -w | awk '{print $1}'"));
             echo 'Wörter ges: '.$c.PHP_EOL;
             echo "doneeee";
             exit();

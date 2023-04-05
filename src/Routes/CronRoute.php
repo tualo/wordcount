@@ -20,9 +20,11 @@ class CronRoute implements IRoute{
         BasicRoute::add('/wordcount',function($matches){
             set_time_limit(300);
             $transPath='temp/bke446s44sarm3oh35o90hg2c9';
-            $translation='.ht_58cea44e-1de9-4044-9eda-7ed3647f013f';
-            shell_exec('rm '.$transPath.'/*.jpg');
-            shell_exec('gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile='.$transPath.'/%03d.jpg '.$transPath.'/'.$translation);
+
+            $translation='.ht12345678';
+            // shell_exec('rm '.$transPath.'/*.jpg');
+            // shell_exec('gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile='.$transPath.'/%03d.jpg '.$transPath.'/'.$translation);
+            /*
             $output = shell_exec('ls -lisah '.$transPath."/*.jpg | awk '{print $11}'");
             $fileARR=explode(PHP_EOL,$output);
             echo "<pre>$output";
@@ -30,13 +32,16 @@ class CronRoute implements IRoute{
             if (isset($fileARR) && count($fileARR)>1){
                 foreach($fileARR as $file){
                     if(strlen($file)>1 ){
-                        $c=shell_exec('tesseract -l oci+deu '.$file.' stdout | wc');
+                        $c=shell_exec('tesseract -l oci+deu '.$file.' stdout | wc -l');
                         echo $c.PHP_EOL;
                     }
                 }
             }
                 echo '</pre>';
-                
+            */
+            shell_exec('pdftotxt '.$transPath.'/'.$translation);
+            $c=    shell_exec('less '.$transPath.'/'.$translation.'.txt | wc -w');
+            echo 'Wörter ges: '.$c.PHP_EOL;
             echo "doneeee";
             exit();
 //            gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile=%03d.jpg .ht_58cea44e-1de9-4044-9eda-7ed3647f013f

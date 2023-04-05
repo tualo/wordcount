@@ -27,6 +27,12 @@ class CronRoute implements IRoute{
             $fileARR=explode(PHP_EOL,$output);
             echo "<pre>$output";
             print_r($fileARR);
+            if (isseet($fileARR) && count($fileARR)>1){
+                foreach($fileARR as $file){
+                    $c=shell_exec('tesseract -l oci+deu '.$file.' stdout | wc');
+                    echo $c.PHP_EOL;
+                }
+            }
                 echo '</pre>';
                 
             echo "doneeee";

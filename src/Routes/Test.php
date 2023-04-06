@@ -13,11 +13,31 @@ class Test implements IRoute{
         BasicRoute::add('/wordcounttest',function($matches){
 
             set_time_limit(300);
-            $sql = 'select * from translations where id not in (select translation_id from translations_source_informations) limit 1';
+            /**
+             * 
+             
+            create table translations_texts (
+                id varchar(36),
+                type varchar(15),
+                page integer default 0,
+                primary key (id,type,page),
+                createat datetime default current_timestamp,
+
+                constraint fk_translations_id 
+                foreign key (id)
+                references translations(id)
+                on delete cascade
+                on update cascade
+            )            
+
+             */
+
+            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) limit 1';
             $list = self::db()->direct($sql);
             foreach($list as $item){
                 $path = App::get('tempPath').'/'.(Uuid::uuid4())->toString();
                 $file = $path.'/original.pdf';
+                
                 if (mkdir($path)){
                     $res = DSFileHelper::getFile(self::db(),'translations',$item['document'],true);
                     if($res['success']===true){
@@ -33,10 +53,43 @@ class Test implements IRoute{
                         $params[] =  '-sOutputFile='.$path.'/%05d.jpg';
                         $params[] =  $file;
                         exec( implode(' ',$params),$gsresult,$returnCode);
-                        print_r($gsresult);
-                        var_dump($returnCode);
-                        exit();
+                        unlink($file);
+                        if ($returnCode==0){
+                            $images = glob($path.'/*.jpg');
+                            $pageNum = 0;
+                            foreach($images as $image){
+                                $pageNum++;
+                                $params = ['tesseract'];
+                                //$params[] = "-l";
+                                //$params[] = "$tesseractSource";
+                                $params[] = $image;
+                                $params[] = "stdout";
+                                exec(implode(' ',$params),$data,$returnCode);
+                                if ($returnCode==0){
+                                    $sql = 'insert into translations_texts (
+                                        id,
+                                        type,
+                                        page,
+                                        data
+                                    ) values (
+                                        {id},
+                                        {type},
+                                        {page},
+                                        {data}
+                                    )';
+                                    self::db()->direct($sql,[
+                                        'id'=>$item['id'],
+                                        'page'=>$pageNum,
+                                        'type'=>'source',
+                                        'data'=>implode("\n",$data)
+                                    ]);
+                                }
+                            }
+                            unlink($image);
+                        }
+
                     }
+                    rmdir($path);
                 }
 
                 

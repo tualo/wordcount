@@ -44,25 +44,32 @@ class Test implements IRoute{
                     $res = DSFileHelper::getFile(self::db(),'translations',$item['document'],true);
                     if($res['success']===true){
                         file_put_contents($file,$res['data']);
-
+                        $extension = 'png';
+                        $gs_device = 'pngmono';
+                        $resolution = '300';
+                        if (isset($_REQUEST['resolution'])) $resolution = intval($_REQUEST['resolution']);
+                        if (isset($_REQUEST['gs_device'])) $gs_device = intval($_REQUEST['gs_device']);
+                        if (isset($_REQUEST['extension'])) $extension = intval($_REQUEST['extension']);
+                        
                         $params = ['gs'];
                         $params[] =  '-q';
                         $params[] =  '-dNOPAUSE';
                         $params[] =  '-dDOPDFMARKS=false';
                         $params[] =  '-dBATCH';
-                        $params[] =  '-sDEVICE=jpeg';
-                        $params[] =  '-r144';
-                        $params[] =  '-sOutputFile='.$path.'/%05d.jpg';
+                        $params[] =  '-sDEVICE='.$gs_device;
+                        $params[] =  '-r'.$resolution;
+                        $params[] =  '-sOutputFile='.$path.'/%05d.'.$extension;
                         $params[] =  $file;
                         exec( implode(' ',$params),$gsresult,$returnCode);
                         unlink($file);
                         if ($returnCode==0){
-                            $images = glob($path.'/*.jpg');
+                            $images = glob($path.'/*.'.$extension);
                             $pageNum = 0;
                             foreach($images as $image){
                                 $pageNum++;
                                 $params = ['tesseract'];
-                                //$params[] = "-l";
+                                $params[] = "-l";
+                                $params[] = "oci";
                                 //$params[] = "$tesseractSource";
                                 $params[] = $image;
                                 $params[] = "stdout";

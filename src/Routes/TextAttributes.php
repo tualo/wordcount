@@ -11,7 +11,7 @@ class TextAttributes implements IRoute{
     public static function match($expr,$text):array {
         preg_match_all($expr,$text,$res);
         if (is_null($res)) return [];
-        return $res;
+        return $res[0];
     }
     public static function getTextAttributes($config,$text):array{
         $result = [];
@@ -40,6 +40,10 @@ class TextAttributes implements IRoute{
         $all_words_found = self::match( $all_word_regexp, $text );
         $result['limited_words']=$limited_words_found;
         $result['limited_words_count']=count($limited_words_found);
+
+        $result['all_words']=$all_words_found;
+        $result['all_words_count']=count($all_words_found);
+        
 
         $whitespace_regexp = "/\s/im";
         $whitespaces = self::match($whitespace_regexp,$text);
@@ -123,13 +127,12 @@ class TextAttributes implements IRoute{
                 on (translations_texts.id,translations_texts.type,translations_texts.page,translations_meassure_type.meassure_type)
                 = (translations_texts_attributes.id,translations_texts_attributes.type,translations_texts_attributes.page,translations_texts_attributes.meassure_type)
             having translations_texts_attributes_id is null        
-            limit 1;
+            limit 30
             ';
             $list = self::db()->direct($sql);
             foreach($list as $item){
                 $res = self::getTextAttributes($item,$item['data']);
-                print_r($res);
-                $sql = 'insert into translations_texts_attributes
+                $sql = 'replace into translations_texts_attributes
                 (
                     meassure_type,
                     id,

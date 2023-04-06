@@ -47,6 +47,8 @@ class Test implements IRoute{
                         $extension = 'png';
                         $gs_device = 'pngmono';
                         $resolution = '300';
+                        $tesseractSource = 'eng';
+                        
                         if (isset($_REQUEST['resolution'])) $resolution = intval($_REQUEST['resolution']);
                         if (isset($_REQUEST['gs_device'])) $gs_device = intval($_REQUEST['gs_device']);
                         if (isset($_REQUEST['extension'])) $extension = intval($_REQUEST['extension']);
@@ -69,7 +71,7 @@ class Test implements IRoute{
                                 $pageNum++;
                                 $params = ['tesseract'];
                                 $params[] = "-l";
-                                $params[] = "oci";
+                                $params[] = "oci+$tesseractSource";
                                 //$params[] = "$tesseractSource";
                                 $params[] = $image;
                                 $params[] = "stdout";

@@ -12,7 +12,7 @@ class Test implements IRoute{
     public static function register(){
         BasicRoute::add('/wordcounttest',function($matches){
 
-            set_time_limit(300);
+            set_time_limit(3000);
             /**
              * 
              drop table translations_texts;
@@ -32,11 +32,19 @@ class Test implements IRoute{
                 on update cascade
             )            
 
+            alter table translations add  is_processing bigint default 0;
              */
 
-            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) limit 1';
+            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 100';
             $list = self::db()->direct($sql);
+            $procid = time();
             foreach($list as $item){
+                $item['procid']=$procid;
+                self::db()->direct('update translations set is_processing={procid} where id={id}',$item);
+            }
+
+            foreach($list as $item){
+                self::db()->direct('update',$item);
                 $path = App::get('tempPath').'/'.(Uuid::uuid4())->toString();
                 $file = $path.'/original.pdf';
                 
@@ -102,6 +110,7 @@ class Test implements IRoute{
 
                     }
                     rmdir($path);
+                    self::db()->direct('update translations set is_processing=0 where id={id}',$item);
                 }
 
                 

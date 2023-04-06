@@ -38,10 +38,10 @@ class TextAttributes implements IRoute{
 
         $limited_words_found = self::match( $limited_word_regexp, $text );
         $all_words_found = self::match( $all_word_regexp, $text );
-        $result['limited_words']=$limited_words_found;
+        
+        //$result['limited_words']=$limited_words_found;
         $result['limited_words_count']=count($limited_words_found);
-
-        $result['all_words']=$all_words_found;
+        //$result['all_words']=$all_words_found;
         $result['all_words_count']=count($all_words_found);
         
 
@@ -63,9 +63,20 @@ class TextAttributes implements IRoute{
             $charsInWords+=strlen($item);
         }
         $result['all_words_characters'] = $charsInWords;
-
-
-
+        
+        $unique = array_unique($all_words_found);
+        $list = [];
+        foreach($unique as $item){
+            $elem = [
+                'word'=>$item,
+                'count'=>0
+            ];
+            foreach($all_words_found as $aelem){
+                if ($item==$aelem) $elem['count']++;
+            }
+            $list[] = $elem;
+        }
+        $result['unique']=$list;
         return $result;
     }
     public static function register(){

@@ -15,13 +15,15 @@ class Test implements IRoute{
             set_time_limit(300);
             /**
              * 
-             
+             drop table translations_texts;
             create table translations_texts (
                 id varchar(36),
                 type varchar(15),
                 page integer default 0,
                 primary key (id,type,page),
                 createat datetime default current_timestamp,
+
+                data blob,
 
                 constraint fk_translations_id 
                 foreign key (id)
@@ -84,8 +86,8 @@ class Test implements IRoute{
                                         'data'=>implode("\n",$data)
                                     ]);
                                 }
+                                unlink($image);
                             }
-                            unlink($image);
                         }
 
                     }

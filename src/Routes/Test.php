@@ -48,7 +48,7 @@ class Test implements IRoute{
                         $gs_device = 'pngmono';
                         $resolution = '300';
                         $tesseractSource = 'eng';
-                        
+
                         if (isset($_REQUEST['resolution'])) $resolution = intval($_REQUEST['resolution']);
                         if (isset($_REQUEST['gs_device'])) $gs_device = intval($_REQUEST['gs_device']);
                         if (isset($_REQUEST['extension'])) $extension = intval($_REQUEST['extension']);
@@ -75,6 +75,7 @@ class Test implements IRoute{
                                 //$params[] = "$tesseractSource";
                                 $params[] = $image;
                                 $params[] = "stdout";
+                                $data = [];
                                 exec(implode(' ',$params),$data,$returnCode);
                                 if ($returnCode==0){
                                     $sql = 'insert into translations_texts (

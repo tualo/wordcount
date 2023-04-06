@@ -8,6 +8,11 @@ use Ramsey\Uuid\Uuid;
 
 class TextAttributes implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
+    public static function match($expr,$text):array {
+        preg_match_all($expr,$text,$res);
+        if (is_null($res)) return [];
+        return $res;
+    }
     public static function getTextAttributes($config,$text):array{
         $result = [];
         $config_default = [
@@ -16,12 +21,46 @@ class TextAttributes implements IRoute{
             'word_contains'=>"\w",
             'trim_at_first'=>1,
             'remove_double_whitespaces'=>1,
-            'remove_carriage_return'=>1
+            'remove_carriage_return'=>1,
+            'remove_double_new_line'=>1
         ];
         $config=array_merge($config_default ,$config);
-        $limited_word_regexp = "/(?P<word>[".$config['word_contains']."]){".$config['min_word_length'].",".$config['max_word_length']."}/gim";
-        preg_match($limited_word_regexp,$text,$limited_words_found);
-        $result['limited_words_found']=$limited_words_found;
+        if ($config['trim_at_first']=='1') $text = trim($text);
+
+        if ($config['remove_carriage_return']=='1') $text = preg_replace("/\r/","",$text);
+        if ($config['remove_double_whitespaces']=='1') $text = preg_replace("/\s+/","",$text);
+        if ($config['remove_double_new_line']=='1') $text = preg_replace("/\n+/","",$text);
+
+
+        $limited_word_regexp = "/([".$config['word_contains']."]){".$config['min_word_length'].",".$config['max_word_length']."}/im";
+        $all_word_regexp = "/([".$config['word_contains']."]){".$config['min_word_length'].",}/im";
+
+        $limited_words_found = self::match( $limited_word_regexp, $text );
+        $all_words_found = self::match( $all_word_regexp, $text );
+        $result['limited_words']=$limited_words_found;
+        $result['limited_words_count']=count($limited_words_found);
+
+        $whitespace_regexp = "/(\s)/im";
+        $whitespaces = self::match($whitespace_regexp,$text);
+        $result['whitespaces']=count($whitespaces);
+
+        $newline_regexp = "/(\n)/im";
+        $newlines = self::match($newline_regexp,$text);
+        $result['newlines']=count($newlines);
+
+        $charsInWords=0;
+        foreach($result['limited_words'] as $item){
+            $charsInWords+=strlen($item);
+        }
+        $result['limited_words_characters'] = $charsInWords;
+        $charsInWords=0;
+        foreach($all_words_found as $item){
+            $charsInWords+=strlen($item);
+        }
+        $result['all_words_characters'] = $charsInWords;
+
+
+
         return $result;
     }
     public static function register(){
@@ -87,7 +126,7 @@ class TextAttributes implements IRoute{
             ';
             $list = self::db()->direct($sql);
             foreach($list as $item){
-                $res = self::getTextAttributes($item,$item['text']);
+                $res = self::getTextAttributes($item,$item['data']);
                 print_r($res);
                 $sql = 'insert into translations_texts_attributes
                 (
@@ -104,7 +143,8 @@ class TextAttributes implements IRoute{
                     {data}
                 )
                 ';
-                self::db()->direct($sql,$res);
+                $item['json']=json_encode($res);
+                self::db()->direct($sql,$item);
             }
             
         },array('get'),true);

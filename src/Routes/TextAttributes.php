@@ -38,7 +38,7 @@ class TextAttributes implements IRoute{
 
         $limited_words_found = self::match( $limited_word_regexp, $text );
         $all_words_found = self::match( $all_word_regexp, $text );
-        
+
         //$result['limited_words']=$limited_words_found;
         $result['limited_words_count']=count($limited_words_found);
         //$result['all_words']=$all_words_found;
@@ -54,7 +54,7 @@ class TextAttributes implements IRoute{
         $result['newlines']=count($newlines);
 
         $charsInWords=0;
-        foreach($result['limited_words'] as $item){
+        foreach($limited_words_found as $item){
             $charsInWords+=strlen($item);
         }
         $result['limited_words_characters'] = $charsInWords;

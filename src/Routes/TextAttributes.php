@@ -28,8 +28,9 @@ class TextAttributes implements IRoute{
         if ($config['trim_at_first']=='1') $text = trim($text);
 
         if ($config['remove_carriage_return']=='1') $text = preg_replace("/\r/","",$text);
-        if ($config['remove_double_whitespaces']=='1') $text = preg_replace("/\s+/","",$text);
-        if ($config['remove_double_new_line']=='1') $text = preg_replace("/\n+/","",$text);
+        if ($config['remove_double_whitespaces']=='1') $text = preg_replace("/[^\S\r\n]+/"," ",$text);
+        if ($config['remove_double_new_line']=='1') $text = preg_replace("/\n+/","\n",$text);
+
 
 
         $limited_word_regexp = "/([".$config['word_contains']."]){".$config['min_word_length'].",".$config['max_word_length']."}/im";
@@ -40,11 +41,11 @@ class TextAttributes implements IRoute{
         $result['limited_words']=$limited_words_found;
         $result['limited_words_count']=count($limited_words_found);
 
-        $whitespace_regexp = "/(\s)/im";
+        $whitespace_regexp = "/\s/im";
         $whitespaces = self::match($whitespace_regexp,$text);
         $result['whitespaces']=count($whitespaces);
 
-        $newline_regexp = "/(\n)/im";
+        $newline_regexp = "/\n/im";
         $newlines = self::match($newline_regexp,$text);
         $result['newlines']=count($newlines);
 
@@ -140,7 +141,7 @@ class TextAttributes implements IRoute{
                     {id},
                     {type},
                     {page},
-                    {data}
+                    {json}
                 )
                 ';
                 $item['json']=json_encode($res);

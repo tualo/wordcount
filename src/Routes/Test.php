@@ -111,7 +111,7 @@ class Test implements IRoute{
                     }
                     rmdir($path);
                     self::db()->direct('update translations set is_processing=0 where id={id}',$item);
-                    App::executeDefferedRoute('/wordcountattributes');
+                    App::executeDefferedRoute('/wordcountattributes','now');
                 }   
 
                 

@@ -5,6 +5,8 @@ use Tualo\Office\Basic\Route as BasicRoute;
 use Tualo\Office\Basic\IRoute;
 use Tualo\Office\DS\DSFileHelper;
 use Ramsey\Uuid\Uuid;
+use Tualo\Office\DS\DSModel;
+use Tualo\Office\DS\DataRenderer;
 
 class TextAttributes implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
@@ -162,6 +164,35 @@ class TextAttributes implements IRoute{
                 self::db()->direct($sql,$item);
             }
             
+
+
+            /**
+             * 
+             * 
+              CREATE TABLE `translations_mailtemplates` (
+                `type` varchar(128) NOT NULL,
+                `send_from` varchar(255) DEFAULT '',
+                `send_from_name` varchar(255) DEFAULT '',
+                `subject_template` varchar(255) DEFAULT '',
+                `reply_to` varchar(255) DEFAULT '',
+                `reply_to_name` varchar(255) DEFAULT '',
+                `body` longtext DEFAULT '',
+                PRIMARY KEY (`type`)
+            )
+             */
+            $row = self::db()->singleRow('select * from translations_mailtemplates where type="new_customer_document"');
+
+            $mailModel = new DSModel('outgoing_mails');
+            $mailModel->set('send_from',$row['send_from'])
+                ->set('send_from_name',$row['send_from_name'])
+                ->set('send_to',$row['send_to'])
+                ->set('reply_to',$row['reply_to'])
+                ->set('reply_to_name',$row['reply_to_name'])
+                ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
+                ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
+    
+
+
         },array('get'),true);
     }
 }

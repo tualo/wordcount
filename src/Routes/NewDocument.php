@@ -24,7 +24,7 @@ class NewDocument implements IRoute{
                 translations_mailtemplates.subject_template,
                 translations_mailtemplates.body,
                 translations_mailtemplates.type,
-                
+                view_translations_new_offer_request_document_mail.*
                  
             from 
                 translations_mailtemplates 

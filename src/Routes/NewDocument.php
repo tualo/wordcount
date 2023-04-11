@@ -37,7 +37,7 @@ class NewDocument implements IRoute{
                 $mailModel = new DSModel('outgoing_mails');
                 $mailModel->set('send_from',$row['send_from'])
                     ->set('send_from_name',$row['send_from_name'])
-                    ->set('send_to',$row['send_to'])
+                    ->set('send_to',$row['email'])
                     ->set('reply_to',$row['reply_to'])
                     ->set('reply_to_name',$row['reply_to_name'])
                     ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )

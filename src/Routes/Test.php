@@ -14,6 +14,7 @@ class Test implements IRoute{
 
             set_time_limit(3000);
             /**
+             * exec('at 37246 wget ')
              * 
              drop table translations_texts;
             create table translations_texts (
@@ -35,7 +36,7 @@ class Test implements IRoute{
             alter table translations add  is_processing bigint default 0;
              */
 
-            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 100';
+            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 1';
             $list = self::db()->direct($sql);
             $procid = time();
             foreach($list as $item){
@@ -44,7 +45,6 @@ class Test implements IRoute{
             }
 
             foreach($list as $item){
-                self::db()->direct('update',$item);
                 $path = App::get('tempPath').'/'.(Uuid::uuid4())->toString();
                 $file = $path.'/original.pdf';
                 
@@ -111,7 +111,8 @@ class Test implements IRoute{
                     }
                     rmdir($path);
                     self::db()->direct('update translations set is_processing=0 where id={id}',$item);
-                }
+                    App::executeDefferedRoute('/wordcountattributes');
+                }   
 
                 
             }

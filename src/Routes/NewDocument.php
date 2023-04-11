@@ -46,7 +46,7 @@ class NewDocument implements IRoute{
                 $mail = new OutgoingMail(self::db());
                 $res = $mail->add( $mailModel );
                 //$mail->send();
-                self::db()->direct('update translations_uebersetzer set offer_mail_id={offer_mail_id},offer_mail=now() where id={id}',$row);
+                self::db()->direct('update translations_uebersetzer set offer_mail_id={offer_mail_id},offer_mail=now() where translation={id}',$row);
             }
             App::executeDefferedRoute('/mail/outgoing','now');
         },array('get'),true);

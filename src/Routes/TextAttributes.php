@@ -7,6 +7,7 @@ use Tualo\Office\DS\DSFileHelper;
 use Ramsey\Uuid\Uuid;
 use Tualo\Office\DS\DSModel;
 use Tualo\Office\DS\DataRenderer;
+use Tualo\Office\Mail\OutgoingMail;
 
 class TextAttributes implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
@@ -191,6 +192,9 @@ class TextAttributes implements IRoute{
                 ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
                 ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
     
+            $mail = new OutgoingMail(self::db());
+            $res = $mail->add( $mailModel );
+            $mail->send();
             App::executeDefferedRoute('/mail/outgoing','now');
 
         },array('get'),true);

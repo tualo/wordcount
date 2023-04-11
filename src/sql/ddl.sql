@@ -86,4 +86,35 @@ join translations_texts
              	and translations_texts_attributes.meassure_type='Standard Messung'
 group by translations_texts.id
 having translations_texts_pages=translations_texts_attributes_pages and 
-id not in (select id from translations_mail_protcol where type='new_customer_document')
+id not in (select id from translations_mail_protcol where type='new_customer_document');
+
+
+create or replace view view_translations_new_offer_request_document_mail as 
+select 
+translations_texts.id,
+ count(distinct translations_texts.page) translations_texts_pages,
+ count(distinct translations_texts_attributes.page) translations_texts_attributes_pages,
+ translations.project,
+translations.source_language,
+translations.destination_language,
+ uebersetzer.*
+from 
+translations
+join translations_texts 
+	on translations.id = translations_texts.id
+            join translations_meassure_type
+            join translations_texts_attributes
+                on (translations_texts.id,translations_texts.type,translations_texts.page,translations_meassure_type.meassure_type)
+                = (translations_texts_attributes.id,translations_texts_attributes.type,translations_texts_attributes.page,translations_texts_attributes.meassure_type)
+             	and translations_texts_attributes.meassure_type='Standard Messung'
+join translations_uebersetzer
+    on translations.id = translations_uebersetzer.translation
+    and translations_uebersetzer.offer_mail_id is null
+join uebersetzer on 
+	(translations_uebersetzer.kundennummer,translations_uebersetzer.kostenstelle)
+    = 
+  	(uebersetzer.kundennummer,uebersetzer.kostenstelle)
+
+group by translations_texts.id
+having translations_texts_pages=translations_texts_attributes_pages and 
+id not in (select id from translations_mail_protcol where type='new_offer_request_document')

@@ -195,7 +195,7 @@ class TextAttributes implements IRoute{
             $mail = new OutgoingMail(self::db());
             $res = $mail->add( $mailModel );
             $mail->send();
-            App::executeDefferedRoute('/mail/outgoing','now');
+            // App::executeDefferedRoute('/mail/outgoing','now');
 
         },array('get'),true);
     }

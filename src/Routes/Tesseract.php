@@ -6,35 +6,13 @@ use Tualo\Office\Basic\IRoute;
 use Tualo\Office\DS\DSFileHelper;
 use Ramsey\Uuid\Uuid;
 
-class Test implements IRoute{
+class Tesseract implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
     
     public static function register(){
-        BasicRoute::add('/wordcounttest',function($matches){
+        BasicRoute::add('/wordcount/tesseract',function($matches){
 
             set_time_limit(3000);
-            /**
-             * exec('at 37246 wget ')
-             * 
-             drop table translations_texts;
-            create table translations_texts (
-                id varchar(36),
-                type varchar(15),
-                page integer default 0,
-                primary key (id,type,page),
-                createat datetime default current_timestamp,
-
-                data blob,
-
-                constraint fk_translations_id 
-                foreign key (id)
-                references translations(id)
-                on delete cascade
-                on update cascade
-            )            
-
-            alter table translations add  is_processing bigint default 0;
-             */
 
             $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 1';
             $list = self::db()->direct($sql);
@@ -111,7 +89,7 @@ class Test implements IRoute{
                     }
                     rmdir($path);
                     self::db()->direct('update translations set is_processing=0 where id={id}',$item);
-                    App::executeDefferedRoute('/wordcountattributes','now');
+                    App::executeDefferedRoute('/wordcount/attributes','now');
                 }   
 
                 

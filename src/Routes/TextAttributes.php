@@ -3,11 +3,7 @@ namespace Tualo\Office\Wordcount\Routes;
 use Tualo\Office\Basic\TualoApplication as App;
 use Tualo\Office\Basic\Route as BasicRoute;
 use Tualo\Office\Basic\IRoute;
-use Tualo\Office\DS\DSFileHelper;
-use Ramsey\Uuid\Uuid;
-use Tualo\Office\DS\DSModel;
-use Tualo\Office\DS\DataRenderer;
-use Tualo\Office\Mail\OutgoingMail;
+
 
 class TextAttributes implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
@@ -83,52 +79,8 @@ class TextAttributes implements IRoute{
         return $result;
     }
     public static function register(){
-        BasicRoute::add('/wordcountattributes',function($matches){
-
+        BasicRoute::add('/wordcount/attributes',function($matches){
             set_time_limit(300);
-            /**
-             * 
-            drop table translations_meassure_type;
-            create table translations_meassure_type (
-                meassure_type varchar(36) primary key,
-                min_word_length integer default 1,
-                max_word_length integer default 8,
-                word_contains varchar(100) default '\w\,\.',
-                trim_at_first tinyint default 1,
-                remove_double_whitespaces tinyint default 1,
-                remove_carriage_return tinyint default 1
-            );
-            insert ignore into translations_meassure_type (meassure_type) values ('Standard Messung');
-
-            create table translations_texts_attributes (
-                meassure_type varchar(36),
-                id varchar(36),
-                type varchar(15),
-                page integer default 0,
-                primary key (id,type,page),
-                createat datetime default current_timestamp,
-
-                data JSON,
-
-                key idx_translations_texts_attributes_id_type_page (id,type,page),
-                key idx_translations_texts_attributes_meassure_type (meassure_type),
-                
-                constraint fk_translations_translations_texts 
-                foreign key (id,type,page)
-                references translations_texts(id,type,page)
-                on delete cascade
-                on update cascade,
-
-                constraint fk_translations_translations_meassure_type 
-                foreign key (meassure_type)
-                references translations_meassure_type(meassure_type)
-                on delete cascade
-                on update cascade
-            )
-            */
-
-
-
             $sql = ' 
             select 
                 translations_texts.*,
@@ -166,36 +118,7 @@ class TextAttributes implements IRoute{
             }
             
 
-
-            /**
-             * 
-             * 
-              CREATE TABLE `translations_mailtemplates` (
-                `type` varchar(128) NOT NULL,
-                `send_from` varchar(255) DEFAULT '',
-                `send_from_name` varchar(255) DEFAULT '',
-                `subject_template` varchar(255) DEFAULT '',
-                `reply_to` varchar(255) DEFAULT '',
-                `reply_to_name` varchar(255) DEFAULT '',
-                `body` longtext DEFAULT '',
-                PRIMARY KEY (`type`)
-            )
-             */
-            $row = self::db()->singleRow('select * from translations_mailtemplates where type="new_customer_document"');
-
-            $mailModel = new DSModel('outgoing_mails');
-            $mailModel->set('send_from',$row['send_from'])
-                ->set('send_from_name',$row['send_from_name'])
-                ->set('send_to',$row['send_to'])
-                ->set('reply_to',$row['reply_to'])
-                ->set('reply_to_name',$row['reply_to_name'])
-                ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
-                ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
-    
-            $mail = new OutgoingMail(self::db());
-            $res = $mail->add( $mailModel );
-            $mail->send();
-            // App::executeDefferedRoute('/mail/outgoing','now');
+            App::executeDefferedRoute('/wordcount/newdocument','now');
 
         },array('get'),true);
     }

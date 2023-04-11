@@ -191,7 +191,7 @@ class TextAttributes implements IRoute{
                 ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
                 ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
     
-
+            App::executeDefferedRoute('/mail/outgoing','now');
 
         },array('get'),true);
     }

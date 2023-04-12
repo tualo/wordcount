@@ -48,6 +48,8 @@ class Pdftotext implements IRoute{
                         $params[] =  '-r'.$resolution;
                         $params[] =  '-sOutputFile='.$path.'/%05d.'.$extension;
                         $params[] =  $file;
+                        echo implode(' ',$params);
+                        exit();
                         exec( implode(' ',$params),$gsresult,$returnCode);
                         unlink($file);
                         if ($returnCode==0){

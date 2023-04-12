@@ -64,7 +64,7 @@ class Pdftotext implements IRoute{
                                 $data = [];
                                 exec(implode(' ',$params),$data,$returnCode);
                                 if ($returnCode==0){
-                                    $sql = 'insert into translations_texts (
+                                    $sql = 'insert into translations_texts_txt (
                                         id,
                                         type,
                                         page,

@@ -48,8 +48,6 @@ class Pdftotext implements IRoute{
                         $params[] =  '-r'.$resolution;
                         $params[] =  '-sOutputFile='.$path.'/%05d.'.$extension;
                         $params[] =  $file;
-                        echo implode(' ',$params);
-                        exit();
                         exec( implode(' ',$params),$gsresult,$returnCode);
                         unlink($file);
                         if ($returnCode==0){
@@ -62,7 +60,7 @@ class Pdftotext implements IRoute{
                                 // $params[] = "oci+$tesseractSource";
                                 // $params[] = "$tesseractSource";
                                 $params[] = $image;
-                                $params[] = "stdout";
+                                $params[] = "-";
                                 $data = [];
                                 exec(implode(' ',$params),$data,$returnCode);
                                 if ($returnCode==0){
@@ -81,11 +79,12 @@ class Pdftotext implements IRoute{
                                         'id'=>$item['id'],
                                         'page'=>$pageNum,
                                         'type'=>'source',
-                                        'data'=>implode("\n",$data)
+                                        'data'=>implode(PHP_EOL,$data)
                                     ]);
                                 }
                                 unlink($image);
                             }
+
                         }
 
                     }

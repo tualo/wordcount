@@ -14,7 +14,16 @@ class Tesseract implements IRoute{
 
             set_time_limit(3000);
 
-            $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 1';
+            // $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 1';
+            $sql="select 
+                    translations.*, 
+                    if (languages.tesseract='','eng',languages.tesseract) tesseractSource 
+                from translations,languages 
+                    where translations.document>0 and 
+                    id not in (select id from translations_texts) and  
+                    translations.is_processing=0 and 
+                    languages.id=translations.source_language 
+                limit 1";
             $list = self::db()->direct($sql);
             $procid = time();
             foreach($list as $item){
@@ -33,7 +42,8 @@ class Tesseract implements IRoute{
                         $extension = 'png';
                         $gs_device = 'pngmono';
                         $resolution = '300';
-                        $tesseractSource = 'eng';
+                        //$tesseractSource = 'eng';
+                        $tesseractSource = $item['tesseractSource'];
 
                         if (isset($_REQUEST['resolution'])) $resolution = intval($_REQUEST['resolution']);
                         if (isset($_REQUEST['gs_device'])) $gs_device = intval($_REQUEST['gs_device']);

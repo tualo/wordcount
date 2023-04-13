@@ -17,7 +17,7 @@ class Tesseract implements IRoute{
             // $sql = 'select * from translations where document>0 and id not in (select id from translations_texts) and is_processing=0 limit 1';
             $sql="select 
                     translations.*, 
-                    if (languages.tesseract='','eng',languages.tesseract) tesseractSource 
+                    if (languages.tesseract='','eng',languages.tesseract) tesseractsource 
                 from translations,languages 
                     where translations.document>0 and 
                     translations.id not in (select id from translations_texts) and  
@@ -40,10 +40,10 @@ class Tesseract implements IRoute{
                     if($res['success']===true){
                         file_put_contents($file,$res['data']);
                         $extension = 'png';
-                        $gs_device = 'pngmono';
+                        $gs_device = 'pnggray';
                         $resolution = '300';
                         //$tesseractSource = 'eng';
-                        $tesseractSource = $item['tesseractSource'];
+                        $tesseractSource = $item['tesseractsource'];
 
                         if (isset($_REQUEST['resolution'])) $resolution = intval($_REQUEST['resolution']);
                         if (isset($_REQUEST['gs_device'])) $gs_device = intval($_REQUEST['gs_device']);

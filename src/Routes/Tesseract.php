@@ -20,7 +20,7 @@ class Tesseract implements IRoute{
                     if (languages.tesseract='','eng',languages.tesseract) tesseractSource 
                 from translations,languages 
                     where translations.document>0 and 
-                    id not in (select id from translations_texts) and  
+                    translations.id not in (select id from translations_texts) and  
                     translations.is_processing=0 and 
                     languages.id=translations.source_language 
                 limit 1";

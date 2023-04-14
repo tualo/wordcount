@@ -83,7 +83,7 @@ join translations_texts
             join translations_texts_attributes
                 on (translations_texts.id,translations_texts.type,translations_texts.page,translations_meassure_type.meassure_type)
                 = (translations_texts_attributes.id,translations_texts_attributes.type,translations_texts_attributes.page,translations_texts_attributes.meassure_type)
-             	and translations_texts_attributes.meassure_type='Standard Messung'
+             	and translations_texts_attributes.meassure_type='Standard-Messung'
 group by translations_texts.id
 having translations_texts_pages=translations_texts_attributes_pages and 
 id not in (select id from translations_mail_protcol where type='new_customer_document');
@@ -106,7 +106,7 @@ join translations_texts
             join translations_texts_attributes
                 on (translations_texts.id,translations_texts.type,translations_texts.page,translations_meassure_type.meassure_type)
                 = (translations_texts_attributes.id,translations_texts_attributes.type,translations_texts_attributes.page,translations_texts_attributes.meassure_type)
-             	and translations_texts_attributes.meassure_type='Standard Messung'
+             	and translations_texts_attributes.meassure_type='Standard-Messung'
 join translations_uebersetzer
     on translations.id = translations_uebersetzer.translation
     and translations_uebersetzer.offer_mail_id is null
@@ -115,7 +115,7 @@ join uebersetzer on
     = 
   	(uebersetzer.kundennummer,uebersetzer.kostenstelle)
 
-group by translations_texts.id
+group by translations_texts.id,uebersetzer.kundennummer,uebersetzer.kostenstelle
 having translations_texts_pages=translations_texts_attributes_pages and 
 id not in (select id from translations_mail_protcol where type='new_offer_request_document');
 

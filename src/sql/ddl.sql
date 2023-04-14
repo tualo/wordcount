@@ -117,4 +117,30 @@ join uebersetzer on
 
 group by translations_texts.id
 having translations_texts_pages=translations_texts_attributes_pages and 
-id not in (select id from translations_mail_protcol where type='new_offer_request_document')
+id not in (select id from translations_mail_protcol where type='new_offer_request_document');
+
+drop table if exists translations_texts_txt;
+CREATE TABLE `translations_texts_txt` (
+  `id` varchar(36) NOT NULL,
+  `type` varchar(15) NOT NULL,
+  `page` int(11) NOT NULL DEFAULT 0,
+  `createat` datetime DEFAULT current_timestamp(),
+  `data` blob DEFAULT NULL,
+  PRIMARY KEY (`id`,`type`,`page`),
+  CONSTRAINT `fk_translations_text_txt_id` FOREIGN KEY (`id`) REFERENCES `translations` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ;
+
+drop table if exists translations_texts_txt_attributes;
+create table translations_texts_txt_attributes (
+    meassure_type varchar(36),
+    id varchar(36),
+    type varchar(15),
+    page integer default 0,
+    primary key (id, type, page),
+    createat datetime default current_timestamp,
+    data JSON,
+    key idx_translations_texts_txt_attributes_id_type_page (id, type, page),
+    key idx_translations_texts_txt_attributes_meassure_type (meassure_type),
+    constraint fk_translations_translations_texts_txt foreign key (id, type, page) references translations_texts_txt(id, type, page) on delete cascade on update cascade,
+    constraint fk_translations_translations_meassure_type_txt foreign key (meassure_type) references translations_meassure_type(meassure_type) on delete cascade on update cascade
+);

@@ -144,3 +144,13 @@ create table translations_texts_txt_attributes (
     constraint fk_translations_translations_texts_txt foreign key (id, type, page) references translations_texts_txt(id, type, page) on delete cascade on update cascade,
     constraint fk_translations_translations_meassure_type_txt foreign key (meassure_type) references translations_meassure_type(meassure_type) on delete cascade on update cascade
 );
+
+drop table if exists translations_attributes;
+create table translations_attributes(
+    id varchar(36) DEFAULT UUID() NOT NULL PRIMARY KEY,
+    name varchar(50),
+    description varchar(255),
+    active tinyint
+);
+insert into translations_attributes (name, description,active)values('Beglaubigt','Übersetzung durch vereidigte Übersetzer:innen',1);
+insert into translations_attributes (name, description,active)values('Techn. Übersetzung','fachlich korrekte technische Übersetzungen',1);

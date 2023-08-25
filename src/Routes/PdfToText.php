@@ -9,6 +9,8 @@ use Ramsey\Uuid\Uuid;
 class Pdftotext implements IRoute{
     public static function db() { return App::get('session')->getDB(); }
     
+
+
     public static function register(){
         BasicRoute::add('/wordcount/pdftotext',function($matches){
 

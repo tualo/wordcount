@@ -1,5 +1,7 @@
 <?php
+
 namespace Tualo\Office\Wordcount\Routes;
+
 use Tualo\Office\Basic\TualoApplication as App;
 use Tualo\Office\Basic\Route as BasicRoute;
 use Tualo\Office\Basic\IRoute;
@@ -15,13 +17,16 @@ use Tualo\Office\Basic\IRoute;
                 >>> ROUTE (BASIS URI)
 
 */
-class CronRoute implements IRoute{
-    public static function register(){
-        BasicRoute::add('/wordcount',function($matches){
-            set_time_limit(300);
-            $transPath='temp/bke446s44sarm3oh35o90hg2c9';
 
-            $translation='.ht12345678';
+class CronRoute extends \Tualo\Office\Basic\RouteWrapper
+{
+    public static function register()
+    {
+        BasicRoute::add('/wordcount', function ($matches) {
+            set_time_limit(300);
+            $transPath = 'temp/bke446s44sarm3oh35o90hg2c9';
+
+            $translation = '.ht12345678';
             // shell_exec('rm '.$transPath.'/*.jpg');
             // shell_exec('gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile='.$transPath.'/%03d.jpg '.$transPath.'/'.$translation);
             /*
@@ -39,14 +44,14 @@ class CronRoute implements IRoute{
             }
                 echo '</pre>';
             */
-            shell_exec('pdftotxt '.$transPath.'/'.$translation);
-            $c=  intval(shell_exec('less '.$transPath.'/'.$translation.".txt | wc -w | awk '{print $1}'"));
-            echo 'Wörter ges: '.$c.PHP_EOL;
+            shell_exec('pdftotxt ' . $transPath . '/' . $translation);
+            $c =  intval(shell_exec('less ' . $transPath . '/' . $translation . ".txt | wc -w | awk '{print $1}'"));
+            echo 'Wörter ges: ' . $c . PHP_EOL;
             echo "doneeee";
             exit();
-//            gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile=%03d.jpg .ht_58cea44e-1de9-4044-9eda-7ed3647f013f
-// tesseract -l oci+deu  002.jpg stdout | wc
+            //            gs -dNOPAUSE -dDOPDFMARKS=false -dBATCH -sDEVICE=jpeg -r144 -sOutputFile=%03d.jpg .ht_58cea44e-1de9-4044-9eda-7ed3647f013f
+            // tesseract -l oci+deu  002.jpg stdout | wc
 
-        },array('get'),true);
+        }, array('get'), true);
     }
 }

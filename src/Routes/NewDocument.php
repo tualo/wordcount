@@ -1,5 +1,7 @@
 <?php
+
 namespace Tualo\Office\Wordcount\Routes;
+
 use Tualo\Office\Basic\TualoApplication as App;
 use Tualo\Office\Basic\Route as BasicRoute;
 use Tualo\Office\Basic\IRoute;
@@ -9,11 +11,16 @@ use Tualo\Office\DS\DSModel;
 use Tualo\Office\DS\DataRenderer;
 use Tualo\Office\Mail\OutgoingMail;
 
-class NewDocument implements IRoute{
-    public static function db() { return App::get('session')->getDB(); }
-    
-    public static function register(){
-        BasicRoute::add('/wordcount/newofferrequest',function($matches){
+class NewDocument extends \Tualo\Office\Basic\RouteWrapper
+{
+    public static function db()
+    {
+        return App::get('session')->getDB();
+    }
+
+    public static function register()
+    {
+        BasicRoute::add('/wordcount/newofferrequest', function ($matches) {
             $rows = self::db()->direct('
             select 
                 translations_mailtemplates.send_from,
@@ -32,29 +39,29 @@ class NewDocument implements IRoute{
             where 
                 translations_mailtemplates.type="new_offer_request_document"
             ');
-            foreach($rows as $row){
-                $row['offer_mail_id']=(Uuid::uuid4())->toString();
+            foreach ($rows as $row) {
+                $row['offer_mail_id'] = (Uuid::uuid4())->toString();
                 $mailModel = new DSModel('outgoing_mails');
-                $mailModel->set('send_from',$row['send_from'])
-                    ->set('send_from_name',$row['send_from_name'])
-                    ->set('send_to',$row['email'])
-                    ->set('reply_to',$row['reply_to'])
-                    ->set('reply_to_name',$row['reply_to_name'])
-                    ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
-                    ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
-        
+                $mailModel->set('send_from', $row['send_from'])
+                    ->set('send_from_name', $row['send_from_name'])
+                    ->set('send_to', $row['email'])
+                    ->set('reply_to', $row['reply_to'])
+                    ->set('reply_to_name', $row['reply_to_name'])
+                    ->set('subject', DataRenderer::renderTemplate($row['subject_template'], $row, $runfunction = true, $replaceOnlyMatches = false))
+                    ->set('body', DataRenderer::renderTemplate($row['body'], $row, $runfunction = true, $replaceOnlyMatches = false));
+
                 $mail = new OutgoingMail(self::db());
-                $res = $mail->add( $mailModel );
+                $res = $mail->add($mailModel);
                 //$mail->send();
-                self::db()->direct('update translations_uebersetzer set offer_mail_id={offer_mail_id},offer_mail=now() where translation={id} and kundennummer={kundennummer} and kostenstelle={kostenstelle}',$row);
+                self::db()->direct('update translations_uebersetzer set offer_mail_id={offer_mail_id},offer_mail=now() where translation={id} and kundennummer={kundennummer} and kostenstelle={kostenstelle}', $row);
             }
-            App::executeDefferedRoute('/mail/outgoing','now');
-        },array('get'),true);
+            App::executeDefferedRoute('/mail/outgoing', 'now');
+        }, array('get'), true);
 
-        BasicRoute::add('/wordcount/newdocument',function($matches){
+        BasicRoute::add('/wordcount/newdocument', function ($matches) {
 
-            
-            
+
+
             $rows = self::db()->direct('
             select 
                 translations_mailtemplates.send_from,
@@ -80,24 +87,22 @@ class NewDocument implements IRoute{
             where translations_mailtemplates.type="new_customer_document"
             
             ');
-            foreach($rows as $row){
+            foreach ($rows as $row) {
                 $mailModel = new DSModel('outgoing_mails');
-                $mailModel->set('send_from',$row['send_from'])
-                    ->set('send_from_name',$row['send_from_name'])
-                    ->set('send_to',$row['send_to'])
-                    ->set('reply_to',$row['reply_to'])
-                    ->set('reply_to_name',$row['reply_to_name'])
-                    ->set('subject', DataRenderer::renderTemplate( $row['subject_template'], $row, $runfunction=true, $replaceOnlyMatches=false) )
-                    ->set('body',DataRenderer::renderTemplate($row['body'], $row, $runfunction=true, $replaceOnlyMatches=false));
-        
-                $mail = new OutgoingMail(self::db());
-                $res = $mail->add( $mailModel );
-                //$mail->send();
-                self::db()->direct('insert into translations_mail_protcol (id,type) values ({id},{type})',$row);
-            }
-            App::executeDefferedRoute('/mail/outgoing','now');
-            
+                $mailModel->set('send_from', $row['send_from'])
+                    ->set('send_from_name', $row['send_from_name'])
+                    ->set('send_to', $row['send_to'])
+                    ->set('reply_to', $row['reply_to'])
+                    ->set('reply_to_name', $row['reply_to_name'])
+                    ->set('subject', DataRenderer::renderTemplate($row['subject_template'], $row, $runfunction = true, $replaceOnlyMatches = false))
+                    ->set('body', DataRenderer::renderTemplate($row['body'], $row, $runfunction = true, $replaceOnlyMatches = false));
 
-        },array('get'),true);
+                $mail = new OutgoingMail(self::db());
+                $res = $mail->add($mailModel);
+                //$mail->send();
+                self::db()->direct('insert into translations_mail_protcol (id,type) values ({id},{type})', $row);
+            }
+            App::executeDefferedRoute('/mail/outgoing', 'now');
+        }, array('get'), true);
     }
 }
